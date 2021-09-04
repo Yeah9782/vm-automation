@@ -5,10 +5,16 @@ import os
 import random
 import re
 import string
+import platform
 
 if __name__ == "__main__":
     print('This script only contains functions and cannot be called directly. See demo scripts for usage examples.')
     exit(1)
+
+
+# Check Python version
+def check_python_version():
+    return int(platform.python_version_tuple()[0]) == 3 and int(platform.python_version_tuple()[1]) >= 6
 
 
 # Normalize path (replace '\' and '/' with '\\').
@@ -90,77 +96,63 @@ def randomize_filename(login, file, destination_folder):
 # Generate html report
 def html_report(vm, snapshot, filename, file_args, file_size, sha256, md5, timeout, vm_network_state,
                 reports_directory='reports'):
+    logging.debug(f"Creating report for task {vm}_{snapshot}")
+
     # Set options and paths
     now = datetime.datetime.now()
     time = now.strftime("%Y-%m-%d %H:%M:%S")
-    destination_dir = reports_directory + '/' + sha256
-    destination_file = destination_dir + '/index.html'
+    destination_dir = f'{reports_directory}/{sha256}'
+    destination_file = f'{destination_dir}/index.html'
 
     # Create directory, if it does not exist
     os.makedirs(destination_dir, mode=0o444, exist_ok=True)
 
     # Content of html file
-    html_template_header = f'''
+    html_template_header = f"""
     <!DOCTYPE html>
     <html>
-    <title>Report</title>
+    <title>Report: {filename}</title>
     <body>
-    <h3>File info:</h3>
     <table>
-      <tr>
-        <td><b>Filename:</b></td>
-        <td>{filename}</td>
-      </tr>
-      <tr>
-        <td><b>File args:</b></td>
-        <td>{file_args}</td>
-      </tr>
-      <tr>
-        <td><b>File size:</b></td>
-        <td>{file_size} Kb</td>
-      </tr>
-      <tr>
-        <td><b>SHA256 hash:</b></td>
-        <td>{sha256} (<a href="https://www.virustotal.com/gui/search/{sha256}" target=_blank>VT Search</a>)</td>
-      </tr>
-      <tr>
-        <td><b>MD5 hash:</b></td>
-        <td>{md5}</td>
-      </tr>
-      <tr>    
-        <td><b>Scanned on:</b></td>
-        <td>{time}</td>
-      </tr>
-      <tr>    
-        <td><b>Timeout:</b></td>
-        <td>{timeout} seconds</td>
-      </tr>
-      <tr>    
-        <td><b>Network:</b></td>
-        <td>{vm_network_state}</td>
-      </tr>
-      <tr>    
-        <td><b>Downloads:</b></td>
-        <td>
-        <a href=./{sha256}/{vm}{snapshot}.webm target=_blank>Screen recording</a>, 
-        <a href=./{sha256}/{vm}{snapshot}.pcap target=_blank>Traffic dump</a>, 
-        <a href=./{sha256}/{vm}{snapshot}.dmp target=_blank>Memory dump</a>
-        </td>
-      </tr>
+      <caption><h4>File info:</h4></caption>
+      <tr><td><b>Name:</b></td><td>{filename}</td></tr>
+      <tr><td><b>Arguments:</b></td><td>{file_args}</td></tr>
+      <tr><td><b>Size:</b></td><td>{file_size} Kb</td></tr>
+      <tr><td><b>SHA-256:</b></td>
+        <td>{sha256} (<a href="https://www.virustotal.com/gui/search/{sha256}" target=_blank>VT Search</a>)</td></tr>
+      <tr><td><b>MD5:</b></td><td>{md5}</td></tr>
+      <tr><td><b>Scanned on:</b></td><td>{time}</td></tr>
+      <tr><td><b>Duration:</b></td><td>{timeout} seconds</td></tr>
+      <tr><td><b>Network:</b></td><td>{vm_network_state}</td></tr>
     </table>
-    <br>
-    '''
+    """
+
+    html_template_tasks = f"""<br><br><b>Task:</b> {vm}_{snapshot}<br>
+        <b>Downloads:</b> """
+    if os.path.isfile(f"{destination_dir}/{vm}_{snapshot}.webm"):
+        html_template_tasks += (
+            f"""<a href={vm}_{snapshot}.webm target=_blank>Screen recording</a> """
+        )
+    if os.path.isfile(f"{destination_dir}/{vm}_{snapshot}.pcap"):
+        html_template_tasks += (
+            f"""<a href={vm}_{snapshot}.pcap target=_blank>Traffic dump</a> """
+        )
+    if os.path.isfile(f"{destination_dir}/{vm}_{snapshot}.dmp"):
+        html_template_tasks += (
+            f"""<a href={vm}_{snapshot}.dmp target=_blank>Memory dump</a> """
+        )
 
     # Search for screenshots in reports directory
+    html_template_tasks += """
+    <b><br>Screenshots:</b><br>
+    """
     screenshots = os.listdir(destination_dir)
-
-    html_template_screenshots = f'''<h3>VM:</b> {vm}, <b>Snapshot:</b> {snapshot}<h3>'''
     for screenshot in screenshots:
         # Check if filename matches task name and have .png extension
-        if re.search(rf'{vm}_{snapshot}_\d+\.png', screenshot):
-            html_template_screenshots += f'''
-                <a href="{screenshot}" target=_blank><img src="{screenshot}" width="320" high="240"></img></a>
-                '''
+        if re.search(rf"{vm}_{snapshot}_\d+\.png", screenshot):
+            html_template_tasks += f"""
+                <a href="{screenshot}" target=_blank><img src="{screenshot}" width="120" high="100"></img></a>
+                """
 
     # Write data to report file
     file_object = open(destination_file, mode='a', encoding='utf-8')
@@ -168,4 +160,4 @@ def html_report(vm, snapshot, filename, file_args, file_size, sha256, md5, timeo
     if os.path.getsize(destination_file) == 0:
         file_object.write(html_template_header)
     # Write screenshots block
-    file_object.write(html_template_screenshots)
+    file_object.write(html_template_tasks)

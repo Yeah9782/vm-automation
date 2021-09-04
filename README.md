@@ -106,6 +106,14 @@ VM options:
 * Code optimization and fixes.
 * Better tests coverage.
 
+# Reports examples (WIP)
+<details><summary>Remcos report</summary>
+https://i.imgur.com/20LF1RA.png
+</details>
+<details><summary>NetWire report</summary>
+https://i.imgur.com/YuetU1P.png
+</details>
+
 # Example videos
 * Windows host (version 0.9.2):
 

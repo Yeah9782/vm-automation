@@ -1,4 +1,8 @@
 # Changelog
+Version 2021.09:
+* Updated reports layout
+* Updated tests
+
 Version 0.11:
 * Added '--file_args' option to pass an argument to the main file/executable.
 * '--uac_parent' option renamed to '--open_with' as it may be used with any type of files, not only the executables.

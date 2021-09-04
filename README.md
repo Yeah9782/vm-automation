@@ -108,10 +108,10 @@ VM options:
 
 # Reports examples (WIP)
 <details><summary>Remcos report</summary>
-https://i.imgur.com/20LF1RA.png
+<img src="https://i.imgur.com/20LF1RA.png"></img>
 </details>
 <details><summary>NetWire report</summary>
-https://i.imgur.com/YuetU1P.png
+<img src="https://i.imgur.com/YuetU1P.png"></img>
 </details>
 
 # Example videos

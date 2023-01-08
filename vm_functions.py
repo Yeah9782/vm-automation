@@ -281,7 +281,7 @@ def vm_set_resolution(vm, screen_resolution):
     if not screen_resolution:
         return 0, 0, 0
     if screen_resolution == 'random':
-        screen_resolution = random.choice['1024 768 32', '1280 1024 32', '1440 1080 32', '1600 1200 32', '1920 1080 32']
+        screen_resolution = random.choice(['1024 768 32', '1280 1024 32', '1440 1080 32', '1600 1200 32', '1920 1080 32'])
     logging.debug(f'Changing screen resolution for VM "{vm}".')
     result = vboxmanage(f'controlvm {vm} setvideomodehint {screen_resolution}')
     if result[0] == 0:

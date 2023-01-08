@@ -1,4 +1,7 @@
 # Changelog
+Version 2023.01:
+* Fixed `vm_set_resolution` function
+
 Version 2021.09:
 * Updated reports layout
 * Updated tests
